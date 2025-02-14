@@ -2,10 +2,25 @@
 import express from "express"
 import { Server } from "socket.io"
 import cors from "cors"
+import cron from "node-cron"
 
 const app = express()
 
 app.use(cors())
+
+app.get("/status", (req, res) => {
+    return res.status(200).send("Server is running")
+})
+
+cron.schedule("* * * * *", async () => {
+    try {
+        const response = await fetch(`${process.env.SERVER}/status`)
+        const res = await response.json()
+        console.log(res)
+    } catch (error) {
+        console.log(error.message)
+    }
+})
 
 const server = app.listen(process.env.PORT || 8081, () => {
     console.log(`Server running on port ${process.env.PORT || 8081}`)
