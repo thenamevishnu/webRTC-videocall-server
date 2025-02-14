@@ -15,7 +15,7 @@ app.get("/status", (req, res) => {
 cron.schedule("* * * * *", async () => {
     try {
         const response = await fetch(`${process.env.SERVER}/status`)
-        const res = await response.json()
+        const res = await response.text()
         console.log(res)
     } catch (error) {
         console.log(error.message)
@@ -51,6 +51,14 @@ io.on("connection", (socket) => {
 
     socket.on("update_video", data => {
         socket.to(data.room_id).emit("video_updated", data)
+    })
+
+    socket.on("max-user-connected", data => {
+        socket.to(data.room_id).emit("max_user_reached", data)
+    })
+
+    socket.on("sendMessage", content => {
+        socket.to(content.room_id).emit("receivedMessage", content)
     })
 
 })
